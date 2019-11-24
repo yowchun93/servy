@@ -1,5 +1,7 @@
 defmodule Servy.Handler do
 
+  @pages_path Path.expand("../../pages", __DIR__)
+
   # request = """
   # GET /wildthings HTTP/1.1
   # Host: example.com
@@ -80,7 +82,7 @@ defmodule Servy.Handler do
 
   def route(%{method: "GET", path: "/bears/new"} = conv) do
     file =
-      Path.expand("../../pages", __DIR__)
+      @pages_path
       |> Path.join("form.html")
     case File.read(file) do
       {:ok, content} ->
@@ -99,7 +101,7 @@ defmodule Servy.Handler do
 
   def route(%{method: "GET", path: "/about"} = conv) do
     file =
-      Path.expand("../../pages", __DIR__)
+      @pages_path
       |> Path.join("about.html")
 
     case File.read(file) do

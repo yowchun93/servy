@@ -70,13 +70,26 @@ defmodule Servy.Handler do
     %{ method: method, path: path, resp_body: "", status: nil}
   end
 
-  # can be refactored to match against the Conv map
   def route(%{method: "GET", path: "/wildthings"} = conv) do
     %{ conv | resp_body: "Bears, Lions, Tigers", status: 200}
   end
 
   def route(%{method: "GET", path: "/bears"} = conv) do
     %{ conv | resp_body: "Teddy, Smokey, Paddington", status: 200}
+  end
+
+  def route(%{method: "GET", path: "/bears/new"} = conv) do
+    file =
+      Path.expand("../../pages", __DIR__)
+      |> Path.join("form.html")
+    case File.read(file) do
+      {:ok, content} ->
+        %{ conv | status: 200, resp_body: content }
+      {:error, :enoent} ->
+        %{ conv | status: 404, resp_body: "File not found"}
+      {:error, reason} ->
+        %{ conv | status: 500, resp_body: "File error: #{reason}"}
+    end
   end
 
   # /bears/1

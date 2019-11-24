@@ -2,6 +2,8 @@ defmodule Servy.Handler do
 
   @pages_path Path.expand("../../pages", __DIR__)
 
+  import Servy.Plugins, only: [rewrite_path: 1, log: 1, track: 1, emojify: 1]
+  import Servy.Parser, only: [parse: 1]
   # request = """
   # GET /wildthings HTTP/1.1
   # Host: example.com
@@ -11,65 +13,12 @@ defmodule Servy.Handler do
   def handle(request) do
     request
     |> parse
+    |> log
     |> rewrite_path
     |> route
     |> emojify
     |> track
     |> format_response
-  end
-
-  def emojify(%{status: 200} = conv) do
-    new_resp_body = "😄" <>  "\n" <> conv.resp_body <> "\n" <> "😄"
-    %{ conv | resp_body: new_resp_body}
-  end
-
-  def emojify(%{status: 404} = conv) do
-    conv
-  end
-
-  def track(%{status: 404, path: path} = conv) do
-    IO.puts "Warning: #{path} is on the loose!"
-    conv
-  end
-
-  def track(conv) do
-    conv
-  end
-
-  def rewrite_path(%{path: "/wildlife"} = conv) do
-    %{ conv | path: "/wildthings"}
-  end
-
-  # "/bears?id=1"
-  def rewrite_path(%{path: path} = conv) do
-    regex = ~r{\/(?<thing>\w+)\?id=(?<id>\d+)}
-    captures = Regex.named_captures(regex, path)
-    rewrite_path_captures(conv, captures)
-  end
-
-  def rewrite_path(conv) do
-    conv
-  end
-
-  def rewrite_path_captures(conv, %{id: id, thing: thing}) do
-    %{ conv | path: "/#{thing}/#{id}" }
-  end
-
-  def rewrite_path_captures(conv, _) do
-    conv
-  end
-
-  def log(conv) do
-    IO.inspect conv
-  end
-
-  def parse(request) do
-    [method, path, _] =
-      request
-      |> String.split("\n")
-      |> List.first
-      |> String.split(" ")
-    %{ method: method, path: path, resp_body: "", status: nil}
   end
 
   def route(%{method: "GET", path: "/wildthings"} = conv) do

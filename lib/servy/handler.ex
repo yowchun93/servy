@@ -11,8 +11,18 @@ defmodule Servy.Handler do
     |> parse
     |> rewrite_path
     |> route
+    |> emojify
     |> track
     |> format_response
+  end
+
+  def emojify(%{status: 200} = conv) do
+    new_resp_body = "😄" <>  "\n" <> conv.resp_body <> "\n" <> "😄"
+    %{ conv | resp_body: new_resp_body}
+  end
+
+  def emojify(%{status: 404} = conv) do
+    conv
   end
 
   def track(%{status: 404, path: path} = conv) do
@@ -28,7 +38,22 @@ defmodule Servy.Handler do
     %{ conv | path: "/wildthings"}
   end
 
+  # "/bears?id=1"
+  def rewrite_path(%{path: path} = conv) do
+    regex = ~r{\/(?<thing>\w+)\?id=(?<id>\d+)}
+    captures = Regex.named_captures(regex, path)
+    rewrite_path_captures(conv, captures)
+  end
+
   def rewrite_path(conv) do
+    conv
+  end
+
+  def rewrite_path_captures(conv, %{id: id, thing: thing}) do
+    %{ conv | path: "/#{thing}/#{id}" }
+  end
+
+  def rewrite_path_captures(conv, _) do
     conv
   end
 
@@ -56,11 +81,6 @@ defmodule Servy.Handler do
 
   # /bears/1
   def route(%{method: "GET", path: "/bears/" <> id} = conv) do
-    %{ conv | resp_body: "Bear #{id}", status: 200}
-  end
-
-  # /bears?id=1
-  def route(%{method: "GET", path: "/bears?id=" <> id} = conv) do
     %{ conv | resp_body: "Bear #{id}", status: 200}
   end
 

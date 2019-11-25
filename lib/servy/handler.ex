@@ -4,6 +4,8 @@ defmodule Servy.Handler do
 
   import Servy.Plugins, only: [rewrite_path: 1, log: 1, track: 1, emojify: 1]
   import Servy.Parser, only: [parse: 1]
+  import Servy.FileHandler, only: [handle_file: 2]
+
   # request = """
   # GET /wildthings HTTP/1.1
   # Host: example.com
@@ -30,37 +32,20 @@ defmodule Servy.Handler do
   end
 
   def route(%{method: "GET", path: "/bears/new"} = conv) do
-    file =
-      @pages_path
-      |> Path.join("form.html")
-    case File.read(file) do
-      {:ok, content} ->
-        %{ conv | status: 200, resp_body: content }
-      {:error, :enoent} ->
-        %{ conv | status: 404, resp_body: "File not found"}
-      {:error, reason} ->
-        %{ conv | status: 500, resp_body: "File error: #{reason}"}
-    end
+    @pages_path
+    |> Path.join("form.html")
+    |> handle_file(conv)
+  end
+
+  def route(%{method: "GET", path: "/about"} = conv) do
+    @pages_path
+    |> Path.join("about.html")
+    |> handle_file(conv)
   end
 
   # /bears/1
   def route(%{method: "GET", path: "/bears/" <> id} = conv) do
     %{ conv | resp_body: "Bear #{id}", status: 200}
-  end
-
-  def route(%{method: "GET", path: "/about"} = conv) do
-    file =
-      @pages_path
-      |> Path.join("about.html")
-
-    case File.read(file) do
-      {:ok, content} ->
-        %{ conv | status: 200, resp_body: content }
-      {:error, :enoent} ->
-        %{ conv | status: 404, resp_body: "File not found"}
-      {:error, reason} ->
-        %{ conv | status: 500, resp_body: "File error: #{reason}"}
-    end
   end
 
   def route(%{method: "GET", path: path} = conv) do

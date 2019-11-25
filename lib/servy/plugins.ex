@@ -43,4 +43,8 @@ defmodule Servy.Plugins do
   def emojify(%{status: 404} = conv) do
     conv
   end
+
+  def emojify(conv) do
+    conv
+  end
 end

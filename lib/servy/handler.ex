@@ -7,6 +7,7 @@ defmodule Servy.Handler do
   import Servy.FileHandler, only: [handle_file: 2]
 
   alias Servy.Conv, as: Conv
+  alias Servy.BearController
 
   # request = """
   # GET /wildthings HTTP/1.1
@@ -30,7 +31,12 @@ defmodule Servy.Handler do
   end
 
   def route(%Conv{method: "GET", path: "/bears"} = conv) do
-    %{ conv | resp_body: "Teddy, Smokey, Paddington", status: 200}
+    BearController.index(conv)
+  end
+
+  # /bears/1
+  def route(%Conv{method: "GET", path: "/bears/" <> id} = conv) do
+    BearController.show(conv, id)
   end
 
   def route(%Conv{method: "GET", path: "/bears/new"} = conv) do
@@ -45,18 +51,15 @@ defmodule Servy.Handler do
     |> handle_file(conv)
   end
 
-  # /bears/1
-  def route(%Conv{method: "GET", path: "/bears/" <> id} = conv) do
-    %{ conv | resp_body: "Bear #{id}", status: 200}
-  end
-
   def route(%Conv{method: "GET", path: path} = conv) do
     %{ conv | resp_body: "No #{path} here!", status: 404}
   end
 
   # name=Baloo&type=Brown
   def route(%Conv{method: "POST", path: "/bears"} = conv) do
-    %{ conv | status: 201, resp_body: "Create a bear!"}
+    params = conv.params
+    %{ conv | status: 201,
+      resp_body: "Create a #{params["type"]} bear named #{params["name"]}"}
   end
 
   def route(%Conv{method: "DELETE", path: "/bears" <> _} = conv) do

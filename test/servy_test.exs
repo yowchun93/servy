@@ -77,4 +77,19 @@ defmodule ServyTest do
     IO.puts Servy.Handler.handle(request)
   end
 
+  test "post request with other content type" do
+    request = """
+    POST /bears HTTP/1.1
+    Host: example.com
+    User-Agent: ExampleBrowser/1.0
+    Accept: */*
+    Content-Type: multipart/form-data
+    Content-Length: 21
+
+    name=Baloo&type=Brown
+    """
+
+    IO.puts Servy.Handler.handle(request)
+  end
+
 end

@@ -1,6 +1,8 @@
 defmodule Servy.Parser do
   alias Servy.Conv, as: Conv
 
+  ## implementation of parse, can be improved, because now the requests needs
+  ## two new lines \n\n in order to be parsed
   def parse(request) do
     [top, params_string] = String.split(request, "\n\n")
 

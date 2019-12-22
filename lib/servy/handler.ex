@@ -30,6 +30,10 @@ defmodule Servy.Handler do
     %{ conv | resp_body: "Bears, Lions, Tigers", status: 200}
   end
 
+  def route(%Conv{method: "GET", path: "/api/bears"} = conv) do
+    Servy.Api.BearController.index(conv)
+  end
+
   def route(%Conv{method: "GET", path: "/bears"} = conv) do
     BearController.index(conv)
   end
@@ -62,16 +66,15 @@ defmodule Servy.Handler do
   end
 
   def route(%Conv{method: "DELETE", path: "/bears" <> _} = conv) do
-    %{ conv | status: 403, resp_body: "Deleting a bear is forbidden!"}
+    BearController.delete(conv)
   end
-
 
   def format_response(conv) do
     """
-    HTTP/1.1 #{conv.status} #{status_reason(conv.status)}
-    Content-Type: text/html
-    Content-Length: #{String.length(conv.resp_body)}
-
+    HTTP/1.1 #{conv.status} #{status_reason(conv.status)}\r
+    Content-Type: #{conv.resp_content_type}\r
+    Content-Length: #{String.length(conv.resp_body)}\r
+    \r
     #{conv.resp_body}
     """
   end

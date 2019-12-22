@@ -36,8 +36,8 @@ defmodule Servy.Plugins do
   end
 
   def emojify(%{status: 200} = conv) do
-    new_resp_body = "😄" <>  "\n" <> conv.resp_body <> "\n" <> "😄"
-    %{ conv | resp_body: new_resp_body}
+    # new_resp_body = "😄" <>  "\n" <> conv.resp_body <> "\n" <> "😄"
+    %{ conv | resp_body: conv.resp_body}
   end
 
   def emojify(%{status: 404} = conv) do

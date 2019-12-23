@@ -9,12 +9,6 @@ defmodule Servy.Handler do
   alias Servy.Conv, as: Conv
   alias Servy.BearController
 
-  # request = """
-  # GET /wildthings HTTP/1.1
-  # Host: example.com
-  # User-Agent: ExampleBrowser/1.0
-  # Accept: */*
-  # """
   def handle(request) do
     request
     |> parse
@@ -23,9 +17,11 @@ defmodule Servy.Handler do
     |> route
     |> emojify
     |> track
+    |> put_content_length
     |> format_response
   end
 
+  @spec route(Servy.Conv.t()) :: %{resp_body: any, status: 200 | 201 | 403 | 404 | 500}
   def route(%Conv{method: "GET", path: "/wildthings"} = conv) do
     %{ conv | resp_body: "Bears, Lions, Tigers", status: 200}
   end
@@ -69,11 +65,15 @@ defmodule Servy.Handler do
     BearController.delete(conv)
   end
 
+  def put_content_length(conv) do
+    %{ conv | resp_headers: Map.put(conv.resp_headers, "Content-Length", String.length(conv.resp_body))}
+  end
+
   def format_response(conv) do
     """
     HTTP/1.1 #{conv.status} #{status_reason(conv.status)}\r
-    Content-Type: #{conv.resp_content_type}\r
-    Content-Length: #{String.length(conv.resp_body)}\r
+    Content-Type: #{conv.resp_headers["Content-Type"]}\r
+    Content-Length: #{conv.resp_headers["Content-Length"]}\r
     \r
     #{conv.resp_body}
     """

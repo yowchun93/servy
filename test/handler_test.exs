@@ -76,6 +76,10 @@ defmodule HandlerTest do
     """
   end
 
+  # test "GET /pages/faq" do
+
+  # end
+
   defp remove_whitespace(text) do
     String.replace(text, ~r{\s}, "")
   end

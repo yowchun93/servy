@@ -61,6 +61,14 @@ defmodule Servy.Handler do
     |> handle_file(conv)
   end
 
+  def route(%Conv{method: "GET", path: "/pages/faq"} = conv) do
+    @pages_path
+    |> Path.join("faq.md")
+    |> File.read!
+    |> Earmark.as_html!
+    %{ conv | resp_body: Earmark.as_html!(conv.resp_body) }
+  end
+
   def route(%Conv{method: "GET", path: path} = conv) do
     %{ conv | resp_body: "No #{path} here!", status: 404}
   end

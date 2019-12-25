@@ -4,6 +4,10 @@ defmodule Servy.Parser do
   def parse(request) do
     [top, params_string] = String.split(request, "\r\n\r\n")
 
+    # Production, actual browser request looks different from the one in test files.
+    # As it contains cookies
+    # [top |params_string] = String.split(request, "\r\n\n")
+
     [request_line | header_lines ] = String.split(top, "\r\n")
 
     [method, path, _ ] = String.split(request_line, " ")

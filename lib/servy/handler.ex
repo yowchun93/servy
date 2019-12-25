@@ -21,6 +21,10 @@ defmodule Servy.Handler do
     |> format_response
   end
 
+  def route(%Conv{method: "GET", path: "/"} = conv) do
+    %{conv | resp_body: "Hello welcome"}
+  end
+
   @spec route(Servy.Conv.t()) :: %{resp_body: any, status: 200 | 201 | 403 | 404 | 500}
   def route(%Conv{method: "GET", path: "/wildthings"} = conv) do
     %{ conv | resp_body: "Bears, Lions, Tigers", status: 200}

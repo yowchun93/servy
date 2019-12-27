@@ -3,7 +3,7 @@ defmodule Servy.VideoCam do
     Simulate sending request to external API
   """
   def get_snapshot(camera) do
-    :timer.sleep(1000)
+    :timer.sleep(2000)
 
     "#{camera}-snapshot.jpg"
   end

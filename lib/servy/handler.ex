@@ -9,6 +9,7 @@ defmodule Servy.Handler do
   alias Servy.Conv, as: Conv
   alias Servy.BearController
   alias Servy.VideoCam
+  alias Servy.Fetcher
 
   def handle(request) do
     request
@@ -27,23 +28,13 @@ defmodule Servy.Handler do
   end
 
   def route(%Conv{method: "GET", path: "/snapshots"} = conv) do
-    # Synchronous
-    # snapshot1 = VideoCam.get_snapshot("cam-1")
-    # snapshot2 = VideoCam.get_snapshot("cam-2")
-    # snapshot3 = VideoCam.get_snapshot("cam-3")
+    Fetcher.async(fn -> Servy.VideoCam.get_snapshot("cam-1") end)
+    Fetcher.async(fn -> Servy.VideoCam.get_snapshot("cam-2") end)
+    Fetcher.async(fn -> Servy.VideoCam.get_snapshot("cam-3") end)
 
-    # Async
-    parent = self() # the request-handling process
-
-    spawn(fn -> send(parent, {:result, VideoCam.get_snapshot("cam-1")}) end)
-    spawn(fn -> send(parent, {:result, VideoCam.get_snapshot("cam-2")}) end)
-    spawn(fn -> send(parent, {:result, VideoCam.get_snapshot("cam-3")}) end)
-    # match the messages in the mailbox
-    # receive is a long running process
-    snapshot1 = receive do {:result, filename} -> filename end
-    snapshot2 = receive do {:result, filename} -> filename end
-    snapshot3 = receive do {:result, filename} -> filename end
-
+    snapshot1 = Fetcher.get_result
+    snapshot2 = Fetcher.get_result
+    snapshot3 = Fetcher.get_result
 
     snapshots = [snapshot1, snapshot2, snapshot3]
     %{ conv | status: 200, resp_body: inspect(snapshots)}

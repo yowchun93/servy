@@ -35,8 +35,6 @@ defmodule Servy.Handler do
       |> Enum.map(&Task.async(fn -> VideoCam.get_snapshot(&1) end))
       |> Enum.map(&Task.await/1)
 
-    Fetcher.async(fn -> Servy.Tracker.get_location("bigfoot") end)
-
     where_is_bigfoot = Task.await(task)
 
     %{ conv | status: 200, resp_body: inspect {snapshots, where_is_bigfoot}}

@@ -12,6 +12,8 @@ defmodule Servy.Fetcher do
     spawn(fn -> send(parent, {:result, fun.()}) end)
   end
 
+  # Funny that in receive, you don't have to specify which PID is receiving the result
+  # This is where the usage of task comes to play, it can receive based on PID
   def get_result do
     receive do
       {:result, value} -> value

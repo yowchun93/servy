@@ -56,6 +56,10 @@ defmodule HttpServerTest do
           assert response.body == "Bears, Lions, Tigers"
       end
     end
-
   end
+
+  # test "create pledges" do
+
+  # end
+
 end

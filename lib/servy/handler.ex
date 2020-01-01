@@ -9,7 +9,6 @@ defmodule Servy.Handler do
   alias Servy.Conv, as: Conv
   alias Servy.BearController
   alias Servy.VideoCam
-  alias Servy.Fetcher
 
   def handle(request) do
     request
@@ -25,6 +24,10 @@ defmodule Servy.Handler do
 
   def route(%Conv{method: "GET", path: "/"} = conv) do
     %{conv | resp_body: "Hello welcome"}
+  end
+
+  def route(%Conv{method: "GET", path: "/pledges/new"} = conv) do
+    Servy.PledgeController.new(conv)
   end
 
   def route(%Conv{method: "POST", path: "/pledges"} = conv) do

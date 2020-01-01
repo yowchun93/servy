@@ -2,6 +2,8 @@ defmodule Servy.PledgeServer do
 
   @name :pledge_server
 
+  # Client Interface
+
   def start do
     IO.puts "Starting the pledge server..."
     pid = spawn(__MODULE__, :listen_loop, [[]])
@@ -27,6 +29,8 @@ defmodule Servy.PledgeServer do
     receive do {:response, total} -> total end
   end
 
+  # Server
+
   def listen_loop(state) do
     receive do
       {sender, :create_pledge, name, amount} ->
@@ -46,9 +50,16 @@ defmodule Servy.PledgeServer do
         IO.puts "Unexpected messaged: #{inspect unexpected}"
         listen_loop(state)
     end
+
   end
 
   defp send_pledge_to_service(_name, _amount) do
+    # CODE GOES HERE TO SEND PLEDGE TO EXTERNAL SERVICE
     {:ok, "pledge-#{:rand.uniform(1000)}"}
   end
+
 end
+
+# alias Servy.PledgeServer
+
+# PledgeServer.start()

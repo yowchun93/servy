@@ -40,7 +40,7 @@ defmodule Servy.Handler do
   def route(%Conv{method: "GET", path: "/sensors"} = conv) do
     sensor_data = Servy.SensorServer.get_sensor_data()
 
-    %{ conv | status: 200, resp_body: sensor_data}
+    %{ conv | status: 200, resp_body: inspect sensor_data}
   end
 
   def route(%Conv{method: "GET", path: "/kaboom"} = _conv) do

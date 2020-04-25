@@ -1,6 +1,6 @@
 # Servy
 
-**TODO: Add description**
+** HTTP Server built on Elixir 
 
 ## Installation
 
